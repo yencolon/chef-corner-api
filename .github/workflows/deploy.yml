@@ -23,10 +23,10 @@ jobs:
       
       - name: Build and Deploy
         env: 
-          DB_USER: ${{ secrets.DB_USER }} 
-          DB_PASSWORD:  ${{ secrets.DB_PASSWORD }} 
-          DB_DRIVER: ${{ secrets.DB_DRIVER }}
-          DB_URl: ${{ secrets.DB_URL }}
+          DB_USER:  value
+          DB_PASSWORD: value
+          DB_DRIVER: value
+          DB_URl: value
         run:  sudo mvn clean install
       
       - name: Complete

@@ -11,13 +11,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-
-    env:
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USER: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      DB_DRIVER: ${{ secrets.DB_DRIVER }}
-
+    environment: staging
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -29,11 +23,11 @@ jobs:
             distribution: 'temurin'
       
       - name: Build and Deploy
-        env:
-          DB_URL: 'jdbc:mysql://localhost:3306/bd?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true'
-          DB_USER: 'root'
-          DB_PASSWORD: 'root'
-          DB_DRIVER: 'com.mysql.cj.jdbc.Driver'
+        env: 
+          DB_USER: ${{ secrets.DB_USER }} 
+          DB_PASSWORD:  ${{ secrets.DB_PASSWORD }} 
+          DB_DRIVER: ${{ secrets.DB_DRIVER }}
+          DB_URl: ${{ secrets.DB_URL }}
         run:  sudo mvn clean install
       
       - name: Complete

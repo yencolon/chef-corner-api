@@ -17,8 +17,17 @@ jobs:
       DB_USER: ${{ secrets.DB_SECRETS.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_SECRETS.DB_PASSWORD }}
       DB_DRIVER: ${{ secrets.DB_SECRETS.DB_DRIVER }}
+      DB_DRIVER2: ${{ DB_SECRETS.DB_DRIVER }}
 
     steps:
+      - name: Print Environment Variables
+        run: |
+          echo "DB_DRIVER: $DB_DRIVER"
+      - name: Print Environment Variables
+        run: |
+          echo "DB_DRIVER: $DB_DRIVER2"
+          
+
       - name: Checkout code
         uses: actions/checkout@v3
 

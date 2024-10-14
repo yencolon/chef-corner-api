@@ -13,11 +13,10 @@ jobs:
     runs-on: self-hosted
 
     env:
-      DB_URL: ${{ secrets.DB_SECRETS.DB_URL }}
-      DB_USER: ${{ secrets.DB_SECRETS.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_SECRETS.DB_PASSWORD }}
-      DB_DRIVER: 'com.mysql.cj.jdbc.Driver'
-      DB_DRIVER2: ${{ secrets.DB_DRIVER }}
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USER: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_DRIVER: ${{ secrets.DB_DRIVER }}
 
     steps:
       - name: Checkout code
@@ -33,5 +32,10 @@ jobs:
         run:  sudo mvn clean install
       
       - name: Complete
-        run: sudo java -jar [Location of jar] &
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USERNAME }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DRIVER: ${{ secrets.DB_DRIVER }}
+        run: sudo  java -jar [Location of jar] &
 

@@ -29,13 +29,13 @@ jobs:
             distribution: 'temurin'
       
       - name: Build and Deploy
-        run:  sudo mvn clean install
-      
-      - name: Complete
         env:
           DB_URL: ${{ secrets.DB_URL }}
           DB_USER: ${{ secrets.DB_USERNAME }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DRIVER: ${{ secrets.DB_DRIVER }}
+        run:  sudo mvn clean install
+      
+      - name: Complete
         run: sudo  java -jar [Location of jar] &
 

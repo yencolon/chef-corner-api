@@ -30,10 +30,10 @@ jobs:
       
       - name: Build and Deploy
         env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_DRIVER: ${{ secrets.DB_DRIVER }}
+          DB_URL: 'jdbc:mysql://localhost:3306/bd?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false&createDatabaseIfNotExist=true'
+          DB_USER: 'root'
+          DB_PASSWORD: 'root'
+          DB_DRIVER: 'com.mysql.cj.jdbc.Driver'
         run:  sudo mvn clean install
       
       - name: Complete

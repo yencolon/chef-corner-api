@@ -21,31 +21,8 @@ jobs:
             java-version: '21'
             distribution: 'temurin'
 
-      - name: Create .env file
-        run: |
-          echo DB_DRIVER=${{ secrets.DB_DRIVER }} >> .env
-          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
-          echo DB_URL=${{ secrets.DB_URL }} >> .env
-          echo DB_USER=${{ secrets.DB_USER }} >> .env
+      - name: Copy application.properties from conf to src/main/resources
+        run: cp conf/application.properties src/main/resources/application.properties
 
       - name: Build and Deploy
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_DRIVER: ${{ secrets.DB_DRIVER }}
-        run:  export $(grep -v '^#' .env | xargs) && mvn clean package -DDB_URL="$DB_URL" -DDB_USERNAME="$DB_USERNAME" -DDB_PASSWORD="$DB_PASSWORD"
-      
-#      - name: Complete
-#        env:
-#          DB_URL: ${{ secrets.DB_URL }}
-#          DB_USER: ${{ secrets.DB_USER }}
-#          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-#          DB_DRIVER: com.mysql.cj.jdbc.Driver
-#        run: |
-#          sudo java -DDB_URL="${{ secrets.DB_URL }}" \
-#            -DDB_USER="${{ secrets.DB_USER }}" \
-#            -DDB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-#            -DDB_DRIVER="com.mysql.cj.jdbc.Driver" \
-#            -jar target/chefcorner.jar &
-
+        run:  sudo mvn clean package

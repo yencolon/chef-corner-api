@@ -31,9 +31,9 @@ jobs:
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DRIVER: com.mysql.cj.jdbc.Driver
         run: |
-            sudo java -DDB_URL=${{ secrets.DB_URL }} \
-                      -DDB_USER=${{ secrets.DB_USER }} \
-                      -DDB_PASSWORD=${{ secrets.DB_PASSWORD }} \
-                      -DDB_DRIVER=com.mysql.cj.jdbc.Driver \
-                      -jar target/chefcorner.jar
+          sudo java -DDB_URL="${{ secrets.DB_URL }}" \
+            -DDB_USER="${{ secrets.DB_USER }}" \
+            -DDB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+            -DDB_DRIVER="com.mysql.cj.jdbc.Driver" \
+            -jar target/chefcorner.jar
 

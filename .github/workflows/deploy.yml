@@ -35,5 +35,5 @@ jobs:
             -DDB_USER="${{ secrets.DB_USER }}" \
             -DDB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
             -DDB_DRIVER="com.mysql.cj.jdbc.Driver" \
-            -jar target/chefcorner.jar
+            -jar target/chefcorner.jar &
 

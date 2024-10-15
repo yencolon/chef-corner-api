@@ -29,9 +29,7 @@ jobs:
           echo DB_USER=${{ secrets.DB_USER }} >> .env
 
       - name: Build and Deploy
-        run:  sudo mvn clean package -D$(grep -v '^#' .env | xargs)
-
-
+        run:  sudo export $(grep -v '^#' .env | xargs) && mvn clean package -DDB_URL="$DB_URL" -DDB_USERNAME="$DB_USERNAME" -DDB_PASSWORD="$DB_PASSWORD"
       
 #      - name: Complete
 #        env:

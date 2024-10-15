@@ -21,16 +21,14 @@ jobs:
             java-version: '21'
             distribution: 'temurin'
 
-      - name: Set environment variables
-        run: |
-          export DB_URL=${{ secrets.DB_URL }}
-          export DB_USER=${{ secrets.DB_USER }}
-          export DB_PASSWORD=${{ secrets.DB_PASSWORD }}
-          export DB_DRIVER=com.mysql.cj.jdbc.Driver
-
       - name: Build and Deploy
         run:  sudo mvn clean install
       
       - name: Complete
+        env:
+          DB_URL: ${{ secrets.DB_URL }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_DRIVER: com.mysql.cj.jdbc.Driver
         run: sudo  java -jar target/chefcorner.jar &
 

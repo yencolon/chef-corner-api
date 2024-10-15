@@ -30,5 +30,10 @@ jobs:
           DB_USER: ${{ secrets.DB_USER }}
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
           DB_DRIVER: com.mysql.cj.jdbc.Driver
-        run: sudo  java -jar target/chefcorner.jar &
+        run: |
+          sudo java -jar target/chefcorner.jar > output.log 2>&1 &
+          wait
+
+      - name: Show Java Output
+        run: cat output.log
 

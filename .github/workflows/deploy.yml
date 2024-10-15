@@ -20,6 +20,6 @@ jobs:
         with:
             java-version: '21'
             distribution: 'temurin'
-
+            
       - name: Build and Deploy
         run:  sudo mvn clean package

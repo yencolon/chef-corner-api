@@ -21,15 +21,17 @@ jobs:
             java-version: '21'
             distribution: 'temurin'
 
-      - name: Build and Deploy
-        run:  sudo mvn clean package -D$(grep -v '^#' .env | xargs)
-
       - name: Create .env file
         run: |
           echo DB_DRIVER=${{ secrets.DB_DRIVER }} >> .env
           echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
           echo DB_URL=${{ secrets.DB_URL }} >> .env
           echo DB_USER=${{ secrets.DB_USER }} >> .env
+
+      - name: Build and Deploy
+        run:  sudo mvn clean package -D$(grep -v '^#' .env | xargs)
+
+
       
 #      - name: Complete
 #        env:

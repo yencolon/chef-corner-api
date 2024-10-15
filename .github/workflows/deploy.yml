@@ -25,11 +25,12 @@ jobs:
         run:  sudo mvn clean install
       
       - name: Complete
+
         run: |
-          sudo java -Dspring.datasource.url=${{ secrets.DB_URL }} \
-              -Dspring.datasource.username=${{ secrets.DB_USER }} \
-              -Dspring.datasource.password=${{ secrets.DB_PASSWORD }} \
-              -Dspring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver \
+          sudo java -DDB_URL=${{ secrets.DB_URL }} \
+              -DDB_USER=${{ secrets.DB_USER }} \
+              -DDB_PASSWORD=${{ secrets.DB_PASSWORD }} \
+              -DDB_DRIVER=com.mysql.cj.jdbc.Driver \
               -jar target/chefcorner.jar > output.log 2>&1 &
           wait
 

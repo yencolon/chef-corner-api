@@ -22,4 +22,4 @@ jobs:
             distribution: 'temurin'
 
       - name: Build and Deploy
-        run:  sudo mvn clean install
+        run:  mvn clean install

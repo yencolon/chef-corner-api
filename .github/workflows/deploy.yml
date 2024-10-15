@@ -22,7 +22,7 @@ jobs:
             distribution: 'temurin'
 
       - name: Build and Deploy
-        run:  sudo mvn clean install
+        run:  sudo mvn clean package -D$(grep -v '^#' .env | xargs)
 
       - name: Create .env file
         run: |

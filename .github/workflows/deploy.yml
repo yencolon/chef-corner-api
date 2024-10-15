@@ -23,17 +23,24 @@ jobs:
 
       - name: Build and Deploy
         run:  sudo mvn clean install
-      
-      - name: Complete
-        env:
-          DB_URL: ${{ secrets.DB_URL }}
-          DB_USER: ${{ secrets.DB_USER }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          DB_DRIVER: com.mysql.cj.jdbc.Driver
+
+      - name: Create .env file
         run: |
-          sudo java -DDB_URL="${{ secrets.DB_URL }}" \
-            -DDB_USER="${{ secrets.DB_USER }}" \
-            -DDB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
-            -DDB_DRIVER="com.mysql.cj.jdbc.Driver" \
-            -jar target/chefcorner.jar &
+          echo DB_DRIVER=${{ secrets.DB_DRIVER }} >> .env
+          echo DB_PASSWORD=${{ secrets.DB_PASSWORD }} >> .env
+          echo DB_URL=${{ secrets.DB_URL }} >> .env
+          echo DB_USER=${{ secrets.DB_USER }} >> .env
+      
+#      - name: Complete
+#        env:
+#          DB_URL: ${{ secrets.DB_URL }}
+#          DB_USER: ${{ secrets.DB_USER }}
+#          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+#          DB_DRIVER: com.mysql.cj.jdbc.Driver
+#        run: |
+#          sudo java -DDB_URL="${{ secrets.DB_URL }}" \
+#            -DDB_USER="${{ secrets.DB_USER }}" \
+#            -DDB_PASSWORD="${{ secrets.DB_PASSWORD }}" \
+#            -DDB_DRIVER="com.mysql.cj.jdbc.Driver" \
+#            -jar target/chefcorner.jar &
 

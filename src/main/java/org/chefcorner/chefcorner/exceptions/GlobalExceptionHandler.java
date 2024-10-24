@@ -2,6 +2,7 @@ package org.chefcorner.chefcorner.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -16,6 +17,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public  ResponseEntity<Object> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public  ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)

@@ -1,13 +1,13 @@
 package org.chefcorner.chefcorner.controllers;
 
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 
-@RestController
+@Controller
 public class HelloWorldController {
-
-    @RequestMapping("/hello")
-    public String hello() {
-        return "Hello World!";
+    @GetMapping("/")
+    public String hello(Model model) {
+        return "chefcorner";
     }
 }

@@ -1,11 +1,14 @@
 package org.chefcorner.chefcorner.services.implementation;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.dto.request.LoginUserRequest;
 import org.chefcorner.chefcorner.dto.request.RegisterUserRequest;
 import org.chefcorner.chefcorner.dto.response.SuccessAuthenticationResponse;
+import org.chefcorner.chefcorner.dto.response.SuccessRefreshTokenResponse;
 import org.chefcorner.chefcorner.entities.Role;
 import org.chefcorner.chefcorner.entities.User;
+import org.chefcorner.chefcorner.exceptions.NotFoundException;
 import org.chefcorner.chefcorner.exceptions.UserAlreadyExistsException;
 import org.chefcorner.chefcorner.repositories.RoleRepository;
 import org.chefcorner.chefcorner.repositories.UserRepository;
@@ -29,8 +32,11 @@ public class AuthService implements AuthServiceInterface {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+
+    private final JpaUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
     @Override
@@ -40,11 +46,29 @@ public class AuthService implements AuthServiceInterface {
                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
            SecurityContextHolder.getContext().setAuthentication(authentication);
            WebUserDetails userPrincipal = (WebUserDetails) authentication.getPrincipal();
-           String token = jwtUtils.generateToken(userPrincipal);
-           return new SuccessAuthenticationResponse(token, userPrincipal.user());
+           String accessToken = jwtUtils.generateToken(userPrincipal);
+           String refreshToken = jwtUtils.generateRefreshToken(userPrincipal);
+           // TODO: Save refresh token in database
+           return new SuccessAuthenticationResponse(accessToken, refreshToken, userPrincipal.user());
        }catch (BadCredentialsException e){
            throw new BadCredentialsException("Invalid username or password");
        }
+    }
+
+    @Override
+    public SuccessRefreshTokenResponse refreshUser(HttpServletRequest request) {
+        String authorizationHeader = request.getHeader("Authorization");
+        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+            String refreshToken = authorizationHeader.substring(7);
+            String username = jwtUtils.extractUsername(refreshToken);
+            WebUserDetails userDetails = (WebUserDetails) userDetailsService.loadUserByUsername(username);
+            // TODO: Check if refresh token is in whitelist
+            if(jwtUtils.validateToken(refreshToken, userDetails)){
+                String accessToken = jwtUtils.generateToken(userDetails);
+                return new SuccessRefreshTokenResponse(accessToken, refreshToken);
+            }
+        }
+       return null;
     }
 
     @Override

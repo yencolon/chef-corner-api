@@ -17,8 +17,10 @@ import java.util.stream.Collectors;
 public class JwtUtils {
     @Value("${jwt.secret}")
     private String secretKey;
-    @Value("${jwt.expiration}")
-    private long expirationTimeInMs;
+    @Value("${jwt.access-expiration}")
+    private long accessExpirationTimeInMs;
+    @Value("${jwt.refresh-expiration}")
+    private long refreshExpirationTimeInMs;
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -36,13 +38,21 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
-                .expiration(new Date(System.currentTimeMillis() + expirationTimeInMs))
+                .expiration(new Date(System.currentTimeMillis() + accessExpirationTimeInMs))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .claims(claims)
                 .signWith(getSigningKey())
                 .compact();
     }
 
+    public String generateRefreshToken(WebUserDetails userDetails) {
+        return Jwts.builder()
+                .subject(userDetails.getUsername())
+                .expiration(new Date(System.currentTimeMillis() + refreshExpirationTimeInMs))
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .signWith(getSigningKey())
+                .compact();
+    }
 
     public String extractUsername(String token){
         return extractClaim(token, Claims::getSubject);
@@ -52,7 +62,6 @@ public class JwtUtils {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
 
     private Claims extractAllClaims(String token){
         return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
@@ -70,5 +79,6 @@ public class JwtUtils {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
 
 }

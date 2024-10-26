@@ -38,7 +38,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Refresh a user token")
-    @PostMapping("/toke/refresh")
+    @PostMapping("/token/refresh")
     public ResponseEntity<SuccessRefreshTokenResponse> refresh(HttpServletRequest request) throws Exception  {
         return ResponseEntity.ok(authService.refreshUser(request));
     }

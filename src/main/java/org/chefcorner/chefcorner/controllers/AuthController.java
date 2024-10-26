@@ -1,5 +1,7 @@
 package org.chefcorner.chefcorner.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.dto.request.LoginUserRequest;
@@ -16,15 +18,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Auth", description = "Authentication related operations")
 public class AuthController {
 
     private final AuthService authService;
 
+    @Operation(summary = "Register a new user")
     @PostMapping("/register")
     public ResponseEntity<User> register(@Valid @RequestBody RegisterUserRequest user) throws Exception  {
         return ResponseEntity.ok(authService.registerUser(user));
     }
 
+    @Operation(summary = "Login a user")
     @PostMapping("/login")
     public ResponseEntity<SuccessAuthenticationResponse> login(@Valid @RequestBody LoginUserRequest user) throws Exception  {
         return ResponseEntity.ok(authService.authenticateUser(user));

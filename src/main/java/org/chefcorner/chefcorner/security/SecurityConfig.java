@@ -30,6 +30,7 @@ public class SecurityConfig {
         return httpSecurity
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/").permitAll()
+                        .requestMatchers("/docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // Allow Swagger UI paths
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf(csrf -> csrf.disable())

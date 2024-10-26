@@ -11,5 +11,4 @@ import org.chefcorner.chefcorner.entities.User;
 public class SuccessAuthenticationResponse {
     private String token;
     private User user;
-
 }

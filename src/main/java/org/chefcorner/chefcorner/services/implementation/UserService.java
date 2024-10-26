@@ -1,7 +1,8 @@
 package org.chefcorner.chefcorner.services.implementation;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.entities.User;
+import org.chefcorner.chefcorner.exceptions.NotFoundException;
 import org.chefcorner.chefcorner.repositories.RoleRepository;
 import org.chefcorner.chefcorner.repositories.UserRepository;
 import org.chefcorner.chefcorner.services.interfaces.UserServiceInterface;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
@@ -29,6 +30,15 @@ public class UserService implements UserServiceInterface {
     @Transactional(readOnly = true)
     public User getUser() {
         return null;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserById(Long id) {
+        User user = this.userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
+
+        return user;
     }
 
 }

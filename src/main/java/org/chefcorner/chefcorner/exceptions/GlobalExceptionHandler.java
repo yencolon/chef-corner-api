@@ -14,19 +14,30 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    private ResponseEntity<Object> buildResponseEntity(HttpStatus status, String message) {
+        Map<String, String> response = new HashMap<>();
+        response.put("message", message);
+        return ResponseEntity.status(status).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
-    public  ResponseEntity<Object> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+    public ResponseEntity<Object> handleException(Exception e) {
+        return buildResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public  ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e) {
+        return buildResponseEntity(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<Object> handleNotFoundException(NotFoundException e) {
+        return buildResponseEntity(HttpStatus.NOT_FOUND, e.getMessage());
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
-    public  ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
+    public ResponseEntity<Object> handleUserAlreadyExistsException(UserAlreadyExistsException e) {
+        return buildResponseEntity(HttpStatus.CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

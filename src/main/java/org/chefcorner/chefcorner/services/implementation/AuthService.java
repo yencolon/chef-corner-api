@@ -1,6 +1,6 @@
 package org.chefcorner.chefcorner.services.implementation;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.dto.request.LoginUserRequest;
 import org.chefcorner.chefcorner.dto.request.RegisterUserRequest;
 import org.chefcorner.chefcorner.dto.response.SuccessAuthenticationResponse;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService implements AuthServiceInterface {
 
     private final UserRepository userRepository;

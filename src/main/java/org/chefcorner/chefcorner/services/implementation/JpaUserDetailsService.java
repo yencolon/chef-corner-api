@@ -1,6 +1,6 @@
 package org.chefcorner.chefcorner.services.implementation;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.entities.User;
 import org.chefcorner.chefcorner.repositories.UserRepository;
 import org.chefcorner.chefcorner.security.WebUserDetails;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class JpaUserDetailsService implements UserDetailsService {
 
     private final UserRepository userRepository;

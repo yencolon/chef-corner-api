@@ -7,4 +7,5 @@ import java.util.List;
 public interface UserServiceInterface {
     List<User> getUsers();
     User getUser();
+    User getUserById(Long id);
 }

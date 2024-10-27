@@ -1,6 +1,5 @@
 package org.chefcorner.chefcorner.security;
 
-import lombok.Getter;
 import org.chefcorner.chefcorner.entities.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -11,6 +10,10 @@ import java.util.HashSet;
 import java.util.Set;
 
 public record WebUserDetails(User user) implements UserDetails {
+
+    public User getUser() {
+        return user;
+    }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

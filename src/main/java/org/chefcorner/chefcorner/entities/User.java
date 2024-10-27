@@ -1,5 +1,6 @@
 package org.chefcorner.chefcorner.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -41,6 +42,7 @@ public class User {
     }
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Post> posts;
 
     @ManyToMany(fetch = FetchType.EAGER)
@@ -50,4 +52,8 @@ public class User {
             uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "role_id"})
     )
     private List<Role> roles;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "white_list_token_id", referencedColumnName = "id")
+    private WhiteListToken whiteListToken;
 }

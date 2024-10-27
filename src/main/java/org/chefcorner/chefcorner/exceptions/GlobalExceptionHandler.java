@@ -2,6 +2,7 @@ package org.chefcorner.chefcorner.exceptions;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -28,6 +29,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException e) {
         return buildResponseEntity(HttpStatus.UNAUTHORIZED, e.getMessage());
+    }
+
+    @ExceptionHandler({ForbiddenException.class, AccessDeniedException.class})
+    public ResponseEntity<Object> handleForbiddenException(RuntimeException e) {
+        return buildResponseEntity(HttpStatus.FORBIDDEN, e.getMessage());
     }
 
     @ExceptionHandler(NotFoundException.class)

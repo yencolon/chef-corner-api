@@ -46,7 +46,7 @@ public class AuthService implements AuthServiceInterface {
                    new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
            SecurityContextHolder.getContext().setAuthentication(authentication);
            WebUserDetails userPrincipal = (WebUserDetails) authentication.getPrincipal();
-           String accessToken = jwtUtils.generateToken(userPrincipal);
+           String accessToken = jwtUtils.generateAccessToken(userPrincipal);
            String refreshToken = jwtUtils.generateRefreshToken(userPrincipal);
            // TODO: Save refresh token in database
            return new SuccessAuthenticationResponse(accessToken, refreshToken, userPrincipal.user());
@@ -63,8 +63,8 @@ public class AuthService implements AuthServiceInterface {
             String username = jwtUtils.extractUsername(refreshToken);
             WebUserDetails userDetails = (WebUserDetails) userDetailsService.loadUserByUsername(username);
             // TODO: Check if refresh token is in whitelist
-            if(jwtUtils.validateToken(refreshToken, userDetails)){
-                String accessToken = jwtUtils.generateToken(userDetails);
+            if(jwtUtils.validateRefreshToken(refreshToken, userDetails)){
+                String accessToken = jwtUtils.generateAccessToken(userDetails);
                 return new SuccessRefreshTokenResponse(accessToken, refreshToken);
             }
         }
@@ -95,6 +95,9 @@ public class AuthService implements AuthServiceInterface {
 
         newUser.setRoles(roles);
 
+        SuccessAuthenticationResponse response = new SuccessAuthenticationResponse();
+
+        // TODO return access token and refresh token
         return userRepository.save(newUser);
     }
 

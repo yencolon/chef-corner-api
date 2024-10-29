@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -26,7 +27,7 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
-    public String generateToken(WebUserDetails userDetails) {
+    public String generateAccessToken(WebUserDetails userDetails) {
 
         String roles = userDetails.getAuthorities().stream()
                 .map(Object::toString)
@@ -38,6 +39,7 @@ public class JwtUtils {
 
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .issuer("chefcorner")
                 .expiration(new Date(System.currentTimeMillis() + accessExpirationTimeInMs))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .claims(claims)
@@ -48,22 +50,20 @@ public class JwtUtils {
     public String generateRefreshToken(WebUserDetails userDetails) {
         return Jwts.builder()
                 .subject(userDetails.getUsername())
+                .claim("refresh", "true")
+                .issuer("chefcorner")
                 .expiration(new Date(System.currentTimeMillis() + refreshExpirationTimeInMs))
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String extractUsername(String token){
-        return extractClaim(token, Claims::getSubject);
-    }
-
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
-        final Claims claims = extractAllClaims(token);
+        final Claims claims = extractClaimsAndVerify(token);
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token){
+    private Claims extractClaimsAndVerify(String token){
         return Jwts.parser().verifyWith(getSigningKey()).build().parseSignedClaims(token).getPayload();
     }
 
@@ -74,11 +74,26 @@ public class JwtUtils {
     public Date extractExpiration(String token){
         return extractClaim(token, Claims::getExpiration);
     }
-
-    public Boolean validateToken(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public String extractUsername(String token){
+        return extractClaim(token, Claims::getSubject);
     }
+
+    public String extractRefreshToken(String token){
+        return extractClaimsAndVerify(token).get("refresh").toString();
+    }
+
+    public Boolean validateAccessToken(String token, UserDetails userDetails){
+        final String username = extractUsername(token);
+        final List roles = extractClaimsAndVerify(token).get("roles", List.class);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) );
+    }
+
+    public Boolean validateRefreshToken(String token, UserDetails userDetails){
+        final String username = extractUsername(token);
+        final boolean refresh = extractRefreshToken(token).equals("true");
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && token.contains("refresh"));
+    }
+
 
 
 }

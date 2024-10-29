@@ -1,10 +1,11 @@
 package org.chefcorner.chefcorner.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+
+// TODO: add tags, categories
 
 @Data
 @Entity

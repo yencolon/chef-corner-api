@@ -23,6 +23,8 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        // TODO check that token is an access token and not a refresh token ✅
+        // TODO is returning forbidden if token is not valid or expired ✅
         final String authorizationHeader = request.getHeader("Authorization");
         String username = null;
         String jwt = null;
@@ -34,7 +36,7 @@ public class JwtValidationFilter extends OncePerRequestFilter {
 
         if(username != null && SecurityContextHolder.getContext().getAuthentication() == null){
             final WebUserDetails userDetails = (WebUserDetails) userDetailsService.loadUserByUsername(username);
-            if(jwtUtil.validateToken(jwt, userDetails)){
+            if(jwtUtil.validateAccessToken(jwt, userDetails)){
                 SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities()));
             }
         }

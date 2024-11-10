@@ -82,18 +82,20 @@ public class JwtUtils {
         return extractClaimsAndVerify(token).get("refresh").toString();
     }
 
-    public Boolean validateAccessToken(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
+    // TODO : simplify this method
+    public Boolean validateAccessToken(String token, WebUserDetails userDetails){
+        final String tokenUsername = extractUsername(token);
         final List roles = extractClaimsAndVerify(token).get("roles", List.class);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) );
+
+        final String dbAccessToken = userDetails.getDBAccessToken();
+        final String username = userDetails.getUser().getUsername();
+
+        return username.equals(tokenUsername) && !isTokenExpired(token) && roles.contains("ROLE_USER") && dbAccessToken.equals(token);
     }
 
     public Boolean validateRefreshToken(String token, UserDetails userDetails){
         final String username = extractUsername(token);
         final boolean refresh = extractRefreshToken(token).equals("true");
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && token.contains("refresh"));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && refresh);
     }
-
-
-
 }

@@ -27,7 +27,7 @@ public class AuthController {
 
     @Operation(summary = "Register a new user")
     @PostMapping("/register")
-    public ResponseEntity<User> register(@Valid @RequestBody RegisterUserRequest user) throws Exception  {
+    public ResponseEntity<SuccessAuthenticationResponse> register(@Valid @RequestBody RegisterUserRequest user) throws Exception  {
         return ResponseEntity.ok(authService.registerUser(user));
     }
 

@@ -3,6 +3,7 @@ package org.chefcorner.chefcorner.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 
@@ -28,6 +29,7 @@ public class User {
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Column(nullable = false)
+    @Size(min = 6, message = "Password must be at least 6 characters long")
     private String password;
 
     @Transient
@@ -53,6 +55,7 @@ public class User {
     )
     private List<Role> roles;
 
+    @JsonIgnore
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "white_list_token_id", referencedColumnName = "id")
     private WhiteListToken whiteListToken;

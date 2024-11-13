@@ -15,6 +15,14 @@ public record WebUserDetails(User user) implements UserDetails {
         return user;
     }
 
+    public String getDBAccessToken() {
+        return user.getWhiteListToken().getAccessToken();
+    }
+
+    public String getDBRefreshToken() {
+        return user.getWhiteListToken().getRefreshToken();
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Set<GrantedAuthority> authorities = new HashSet<>();

@@ -37,14 +37,15 @@ public class SecurityConfig {
     SecurityFilterChain securityFilter(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/").permitAll() // Allow Swagger UI paths
                         .requestMatchers("/docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // Allow Swagger UI paths
+                        .requestMatchers("/api/auth/logout", "/api/auth/refresh").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtValidationFilter, UsernamePasswordAuthenticationFilter.class)
-               .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(new AccessDeniedHandlerImpl()).authenticationEntryPoint((new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))))
+                .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(new AccessDeniedHandlerImpl()).authenticationEntryPoint((new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))))
                 // .exceptionHandling(exceptionHandling -> exceptionHandling.accessDeniedHandler(unauthorizedHandler).authenticationEntryPoint((new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))))
                 .build();
     }

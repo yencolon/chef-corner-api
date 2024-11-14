@@ -1,9 +1,9 @@
 package org.chefcorner.chefcorner.services.implementation;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.dto.request.LoginUserRequest;
 import org.chefcorner.chefcorner.dto.request.RegisterUserRequest;
+import org.chefcorner.chefcorner.dto.response.LogoutResponse;
 import org.chefcorner.chefcorner.dto.response.SuccessAuthenticationResponse;
 import org.chefcorner.chefcorner.dto.response.SuccessRefreshTokenResponse;
 import org.chefcorner.chefcorner.entities.Role;
@@ -12,7 +12,6 @@ import org.chefcorner.chefcorner.entities.WhiteListToken;
 import org.chefcorner.chefcorner.exceptions.UserAlreadyExistsException;
 import org.chefcorner.chefcorner.repositories.RoleRepository;
 import org.chefcorner.chefcorner.repositories.UserRepository;
-import org.chefcorner.chefcorner.repositories.WhiteListTokenRepository;
 import org.chefcorner.chefcorner.security.WebUserDetails;
 import org.chefcorner.chefcorner.services.interfaces.AuthServiceInterface;
 import org.chefcorner.chefcorner.utils.JwtUtils;
@@ -33,16 +32,13 @@ public class AuthService implements AuthServiceInterface {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-    private final WhiteListTokenRepository whiteListTokenRepository;
 
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
 
-    private final JpaUserDetailsService userDetailsService;
     private final JwtUtils jwtUtils;
 
     @Override
-    @Transactional
     public SuccessAuthenticationResponse authenticateUser(LoginUserRequest request) {
        try{
            Authentication authentication = authenticationManager.authenticate(
@@ -90,24 +86,24 @@ public class AuthService implements AuthServiceInterface {
 
 
     @Override
-    public SuccessRefreshTokenResponse refreshUser(HttpServletRequest request) {
-        String authorizationHeader = request.getHeader("Authorization");
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
-            String refreshToken = authorizationHeader.substring(7);
-            String username = jwtUtils.extractUsername(refreshToken);
-            WebUserDetails userDetails = (WebUserDetails) userDetailsService.loadUserByUsername(username);
-            // TODO: Check if refresh token is in whitelist
-            if(jwtUtils.validateRefreshToken(refreshToken, userDetails)){
-                String accessToken = jwtUtils.generateAccessToken(userDetails);
-                return new SuccessRefreshTokenResponse(accessToken, refreshToken);
-            }
-        }
-       return null;
+    public SuccessRefreshTokenResponse refreshUser(Authentication authentication) {
+        WebUserDetails userPrincipal = (WebUserDetails) authentication.getPrincipal();
+
+        String refreshToken = userPrincipal.getDBRefreshToken();
+        String accessToken = jwtUtils.generateAccessToken(userPrincipal);
+        saveWhiteListToken(userPrincipal.getUser(), accessToken, refreshToken);
+
+        return new SuccessRefreshTokenResponse(accessToken, refreshToken);
     }
 
     @Override
-    public void logoutUser() {
-
+    public LogoutResponse logoutUser(Authentication authentication) {
+        WebUserDetails userPrincipal = (WebUserDetails) authentication.getPrincipal();
+        User user = userPrincipal.getUser();
+        user.setWhiteListToken(null);
+        userRepository.save(user);
+        SecurityContextHolder.getContext().setAuthentication(null);
+        return new LogoutResponse("User logged out successfully");
     }
 
     @Override
@@ -127,10 +123,6 @@ public class AuthService implements AuthServiceInterface {
         WhiteListToken whiteListToken = new WhiteListToken();
         whiteListToken.setAccessToken(accessToken);
         whiteListToken.setRefreshToken(refreshToken);
-
-        if(user.getWhiteListToken() != null) {
-            whiteListTokenRepository.delete(user.getWhiteListToken());
-        }
 
         user.setWhiteListToken(whiteListToken);
         userRepository.save(user);

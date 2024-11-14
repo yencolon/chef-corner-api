@@ -29,9 +29,9 @@ public class JwtUtils {
 
     public String generateAccessToken(WebUserDetails userDetails) {
 
-        String roles = userDetails.getAuthorities().stream()
+        List<String> roles = userDetails.getAuthorities().stream()
                 .map(Object::toString)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.toList());
 
         Claims claims = Jwts.claims()
                 .add("authorities", roles)
@@ -85,17 +85,19 @@ public class JwtUtils {
     // TODO : simplify this method
     public Boolean validateAccessToken(String token, WebUserDetails userDetails){
         final String tokenUsername = extractUsername(token);
-        final List roles = extractClaimsAndVerify(token).get("roles", List.class);
-
+        final List roles = extractClaimsAndVerify(token).get("authorities", List.class);
         final String dbAccessToken = userDetails.getDBAccessToken();
-        final String username = userDetails.getUser().getUsername();
+        final String username = userDetails.getUsername();
 
         return username.equals(tokenUsername) && !isTokenExpired(token) && roles.contains("ROLE_USER") && dbAccessToken.equals(token);
     }
 
-    public Boolean validateRefreshToken(String token, UserDetails userDetails){
-        final String username = extractUsername(token);
+    public Boolean validateRefreshToken(String token, WebUserDetails userDetails){
+        final String tokenUsername = extractUsername(token);
         final boolean refresh = extractRefreshToken(token).equals("true");
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token) && refresh);
+        final String username = userDetails.getUsername();
+        final String dbRefreshToken = userDetails.getDBRefreshToken();
+
+        return (tokenUsername.equals(username) && !isTokenExpired(token) && refresh && dbRefreshToken.equals(token));
     }
 }

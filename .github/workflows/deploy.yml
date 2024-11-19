@@ -34,7 +34,9 @@ jobs:
         run: |
           # Save the SSH key to a temporary file and set permissions
           echo "$DROPLET_SSH_KEY" > /tmp/deploy_key
+          chmod 700 /tmp
           chmod 600 /tmp/deploy_key
+          
           
           # Define the .jar file path (adjust based on your Maven project structure)
           JAR_FILE=$(ls target/*.jar)

@@ -1,8 +1,10 @@
 package org.chefcorner.chefcorner.services.implementation;
 
 import lombok.RequiredArgsConstructor;
+import org.chefcorner.chefcorner.entities.Post;
 import org.chefcorner.chefcorner.entities.User;
 import org.chefcorner.chefcorner.exceptions.NotFoundException;
+import org.chefcorner.chefcorner.repositories.PostRepository;
 import org.chefcorner.chefcorner.repositories.RoleRepository;
 import org.chefcorner.chefcorner.repositories.UserRepository;
 import org.chefcorner.chefcorner.services.interfaces.UserServiceInterface;
@@ -17,8 +19,7 @@ import java.util.List;
 public class UserService implements UserServiceInterface {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final PostRepository postRepository;
 
     @Override
     @Transactional(readOnly = true)
@@ -35,10 +36,14 @@ public class UserService implements UserServiceInterface {
     @Override
     @Transactional(readOnly = true)
     public User getUserById(Long id) {
-        User user = this.userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
 
-        return user;
+        return this.userRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("User not found with ID " + id));
+    }
+
+    @Override
+    public List<Post> getUserPosts(Long id) {
+        return this.postRepository.findByUserId(id);
     }
 
 }

@@ -31,8 +31,7 @@ public class PostController {
     @Operation(summary = "Create a new post")
     @PostMapping
     public Post createPost(@Valid @RequestBody CreatePostRequest post, Authentication authentication) {
-        User user = ((WebUserDetails)authentication.getPrincipal()).getUser();
-        return this.postService.savePost(post, user);
+        return this.postService.savePost(post, authentication);
     }
 
     @Operation(summary = "Get post by ID")
@@ -52,5 +51,6 @@ public class PostController {
     public void deletePost(@PathVariable("id") Long id) {
         this.postService.deletePost(id);
     }
+
 
 }

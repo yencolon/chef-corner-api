@@ -8,8 +8,10 @@ import org.chefcorner.chefcorner.entities.Post;
 import org.chefcorner.chefcorner.entities.User;
 import org.chefcorner.chefcorner.repositories.CategoryRepository;
 import org.chefcorner.chefcorner.repositories.PostRepository;
+import org.chefcorner.chefcorner.security.WebUserDetails;
 import org.chefcorner.chefcorner.services.interfaces.PostServiceInterface;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,7 @@ public class PostService implements PostServiceInterface {
 
     @Override
     @Transactional
-    public Post savePost(CreatePostRequest post, User user) {
+    public Post savePost(CreatePostRequest post, Authentication authentication) {
 
         Post newPost = new Post();
         newPost.setTitle(post.getTitle());
@@ -51,6 +53,7 @@ public class PostService implements PostServiceInterface {
 
         if(post.isPublished()) newPost.setPublishedAt(System.currentTimeMillis());
 
+        User user = ((WebUserDetails)authentication.getPrincipal()).getUser();
         newPost.setUser(user);
 
         return this.postRepository.save(newPost);

@@ -3,8 +3,10 @@ package org.chefcorner.chefcorner.services.implementation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chefcorner.chefcorner.dto.request.CreatePostRequest;
+import org.chefcorner.chefcorner.entities.Category;
 import org.chefcorner.chefcorner.entities.Post;
 import org.chefcorner.chefcorner.entities.User;
+import org.chefcorner.chefcorner.repositories.CategoryRepository;
 import org.chefcorner.chefcorner.repositories.PostRepository;
 import org.chefcorner.chefcorner.services.interfaces.PostServiceInterface;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,6 +21,7 @@ import java.util.List;
 public class PostService implements PostServiceInterface {
 
     private final PostRepository postRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public List<Post> getPosts() {
@@ -39,6 +42,10 @@ public class PostService implements PostServiceInterface {
         newPost.setContent(post.getContent());
         newPost.setPublished(post.isPublished());
         newPost.setDraft(post.isDraft());
+
+        Category category = categoryRepository.findById(post.getCategoryId()).orElse(null);
+
+        newPost.setCategory(category);
 
         if(post.isDraft()) newPost.setDraftedAt(System.currentTimeMillis());
 

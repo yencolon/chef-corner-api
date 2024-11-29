@@ -75,13 +75,36 @@ public class PostService implements PostServiceInterface {
     @PreAuthorize("@securityService.isPostOwner(#id, authentication)")
     public Post updatePost(Long id, CreatePostRequest post) {
 
-        Post postToUpdate = new Post();
-        postToUpdate.setId(id);
+        Post postToUpdate = this.postRepository.findById(id).orElseThrow();
         postToUpdate.setTitle(post.getTitle());
         postToUpdate.setDescription(post.getDescription());
-       // postToUpdate.setContent(post.getContent());
         postToUpdate.setPublished(post.isPublished());
         postToUpdate.setDraft(post.isDraft());
+
+        if(post.isDraft()) postToUpdate.setDraftedAt(System.currentTimeMillis());
+
+        if(post.isPublished()) postToUpdate.setPublishedAt(System.currentTimeMillis());
+
+        Category category = categoryRepository.findById(post.getCategoryId()).orElse(null);
+        postToUpdate.setCategory(category);
+
+        postToUpdate.getRecipeIngredients().clear();
+
+        post.getIngredients().forEach(ingredient -> {
+            Ingredient existingIngredient = this.ingredientService.findIngredientByName(ingredient.getName());
+
+            if(existingIngredient == null) {
+                existingIngredient = new Ingredient();
+                existingIngredient.setName(ingredient.getName());
+                this.ingredientService.saveIngredient(existingIngredient);
+            }
+
+            IngredientRecipe ingredientRecipe = new IngredientRecipe();
+            ingredientRecipe.setIngredient(existingIngredient);
+            ingredientRecipe.setQuantity(ingredient.getQuantity());
+            ingredientRecipe.setUnit(ingredient.getUnit());
+            postToUpdate.addRecipeIngredient(ingredientRecipe);
+        });
 
         return this.postRepository.save(postToUpdate);
     }
@@ -90,4 +113,6 @@ public class PostService implements PostServiceInterface {
     public void deletePost(Long id) {
         this.postRepository.deleteById(id);
     }
+
+
 }

@@ -35,15 +35,7 @@ jobs:
           # Save the SSH key to a temporary file and set permissions
           echo "$DROPLET_SSH_KEY" > /tmp/deploy_key
           chmod 600 /tmp/deploy_key
-         
-          # Debugging: Print the SSH key path and file permissions
-          echo "SSH Key stored at: /tmp/deploy_key"
-          ls -l /tmp/deploy_key
-
-          # Ensure the .jar file is present
-          echo "Looking for JAR files in target directory..."
-          ls -l target/
-
+          
           # Define the .jar file path and debug its existence
           JAR_FILE=$(ls target/*.jar)
           echo "Detected JAR file: $JAR_FILE"
@@ -55,9 +47,7 @@ jobs:
           # SSH into the droplet with verbose flag
           echo "Restarting service on the Droplet..."
           ssh -v -i /tmp/deploy_key -o StrictHostKeyChecking=no $DROPLET_USER@$DROPLET_IP << 'EOF'
-            sudo systemctl status chefcorner.service
             sudo systemctl restart chefcorner.service
-            sudo systemctl status chefcorner.service
           EOF
 
       # Step 5: Clean up the SSH key

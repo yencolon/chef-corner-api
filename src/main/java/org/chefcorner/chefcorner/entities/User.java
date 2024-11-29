@@ -43,7 +43,7 @@ public class User {
         this.isAdmin = false;
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Post> posts;
 
@@ -56,7 +56,7 @@ public class User {
     private List<Role> roles;
 
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "white_list_token_id", referencedColumnName = "id")
     private WhiteListToken whiteListToken;
 }

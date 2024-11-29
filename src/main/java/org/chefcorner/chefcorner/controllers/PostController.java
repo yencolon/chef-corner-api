@@ -6,8 +6,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.chefcorner.chefcorner.dto.request.CreatePostRequest;
 import org.chefcorner.chefcorner.entities.Post;
-import org.chefcorner.chefcorner.entities.User;
-import org.chefcorner.chefcorner.security.WebUserDetails;
 import org.chefcorner.chefcorner.services.implementation.PostService;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;

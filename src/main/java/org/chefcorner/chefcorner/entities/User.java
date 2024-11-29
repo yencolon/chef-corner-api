@@ -4,12 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.Data;
-
+import lombok.*;
 
 import java.util.List;
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "users")
 public class User {
@@ -43,7 +44,7 @@ public class User {
         this.isAdmin = false;
     }
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     private List<Post> posts;
 
@@ -56,7 +57,7 @@ public class User {
     private List<Role> roles;
 
     @JsonIgnore
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.MERGE, orphanRemoval = true)
     @JoinColumn(name = "white_list_token_id", referencedColumnName = "id")
     private WhiteListToken whiteListToken;
 }

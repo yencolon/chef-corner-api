@@ -1,7 +1,7 @@
 package org.chefcorner.chefcorner.entities;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -10,7 +10,9 @@ import java.util.Set;
 
 // TODO: add tags, categories
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "posts")
 public class Post {
@@ -20,9 +22,6 @@ public class Post {
     @Column(nullable = false)
     private String title;
     private String description;
-    // @Column(nullable = false)
-    //  private String content;
-   // private String url;
     private String image;
     private int likes;
     private int comments;
@@ -44,7 +43,7 @@ public class Post {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    @OneToMany(mappedBy = "post", cascade = { CascadeType.REMOVE , CascadeType.PERSIST, CascadeType.REFRESH })
+    @OneToMany(mappedBy = "post", cascade = { CascadeType.MERGE, CascadeType.PERSIST },  orphanRemoval = true)
     private Set<IngredientRecipe> recipeIngredients = new HashSet<>();
 
     public void addRecipeIngredient(IngredientRecipe ingredientRecipe) {

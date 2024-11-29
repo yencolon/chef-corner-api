@@ -14,14 +14,15 @@ import java.util.Set;
 @Getter
 @Setter
 @Entity
-@Table(name = "posts")
-public class Post {
+@Table(name = "recipes")
+public class Recipe {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
     private String title;
     private String description;
+    private int time;
     private String image;
     private int likes;
     private int comments;
@@ -43,11 +44,11 @@ public class Post {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    @OneToMany(mappedBy = "post", cascade = { CascadeType.MERGE, CascadeType.PERSIST },  orphanRemoval = true)
+    @OneToMany(mappedBy = "recipe", cascade = { CascadeType.MERGE, CascadeType.PERSIST },  orphanRemoval = true)
     private Set<IngredientRecipe> recipeIngredients = new HashSet<>();
 
     public void addRecipeIngredient(IngredientRecipe ingredientRecipe) {
-        ingredientRecipe.setPost(this);
+        ingredientRecipe.setRecipe(this);
         this.recipeIngredients.add(ingredientRecipe);
     }
 }

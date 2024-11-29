@@ -22,7 +22,7 @@ public class IngredientRecipe {
     private Ingredient ingredient;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     @JsonIgnore
-    private Post post;
+    private Recipe recipe;
 }

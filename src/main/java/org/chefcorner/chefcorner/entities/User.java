@@ -46,7 +46,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    private List<Post> posts;
+    private List<Recipe> recipes;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_roles",

@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class CreatePostRequest {
+public class CreateRecipeRequest {
     @NotBlank(message = "Title is required")
     private String title;
     private String description;

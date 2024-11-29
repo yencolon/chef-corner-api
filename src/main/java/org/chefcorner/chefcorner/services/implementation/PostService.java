@@ -3,9 +3,7 @@ package org.chefcorner.chefcorner.services.implementation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.chefcorner.chefcorner.dto.request.CreatePostRequest;
-import org.chefcorner.chefcorner.entities.Category;
-import org.chefcorner.chefcorner.entities.Post;
-import org.chefcorner.chefcorner.entities.User;
+import org.chefcorner.chefcorner.entities.*;
 import org.chefcorner.chefcorner.repositories.CategoryRepository;
 import org.chefcorner.chefcorner.repositories.PostRepository;
 import org.chefcorner.chefcorner.security.WebUserDetails;
@@ -24,6 +22,7 @@ public class PostService implements PostServiceInterface {
 
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
+    private final IngredientService ingredientService;
 
     @Override
     public List<Post> getPosts() {
@@ -41,21 +40,35 @@ public class PostService implements PostServiceInterface {
 
         Post newPost = new Post();
         newPost.setTitle(post.getTitle());
-        newPost.setContent(post.getContent());
+        newPost.setDescription(post.getDescription());
         newPost.setPublished(post.isPublished());
         newPost.setDraft(post.isDraft());
-
-        Category category = categoryRepository.findById(post.getCategoryId()).orElse(null);
-
-        newPost.setCategory(category);
 
         if(post.isDraft()) newPost.setDraftedAt(System.currentTimeMillis());
 
         if(post.isPublished()) newPost.setPublishedAt(System.currentTimeMillis());
 
+        Category category = categoryRepository.findById(post.getCategoryId()).orElse(null);
+        newPost.setCategory(category);
+
         User user = ((WebUserDetails)authentication.getPrincipal()).getUser();
         newPost.setUser(user);
 
+        post.getIngredients().forEach(ingredient -> {
+            Ingredient existingIngredient = this.ingredientService.findIngredientByName(ingredient.getName());
+
+            if(existingIngredient == null) {
+                existingIngredient = new Ingredient();
+                existingIngredient.setName(ingredient.getName());
+                this.ingredientService.saveIngredient(existingIngredient);
+            }
+
+            IngredientRecipe ingredientRecipe = new IngredientRecipe();
+            ingredientRecipe.setIngredient(existingIngredient);
+            ingredientRecipe.setQuantity(ingredient.getQuantity());
+            ingredientRecipe.setUnit(ingredient.getUnit());
+            newPost.addRecipeIngredient(ingredientRecipe);
+        });
         return this.postRepository.save(newPost);
     }
 
@@ -65,7 +78,8 @@ public class PostService implements PostServiceInterface {
         Post postToUpdate = new Post();
         postToUpdate.setId(id);
         postToUpdate.setTitle(post.getTitle());
-        postToUpdate.setContent(post.getContent());
+        postToUpdate.setDescription(post.getDescription());
+       // postToUpdate.setContent(post.getContent());
         postToUpdate.setPublished(post.isPublished());
         postToUpdate.setDraft(post.isDraft());
 

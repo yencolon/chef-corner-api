@@ -5,6 +5,9 @@ import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // TODO: add tags, categories
 
 @Data
@@ -16,9 +19,10 @@ public class Post {
     private Long id;
     @Column(nullable = false)
     private String title;
-    @Column(nullable = false)
-    private String content;
-    private String url;
+    private String description;
+    // @Column(nullable = false)
+    //  private String content;
+   // private String url;
     private String image;
     private int likes;
     private int comments;
@@ -39,4 +43,12 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
+
+    @OneToMany(mappedBy = "post", cascade = { CascadeType.REMOVE , CascadeType.PERSIST, CascadeType.REFRESH })
+    private Set<IngredientRecipe> recipeIngredients = new HashSet<>();
+
+    public void addRecipeIngredient(IngredientRecipe ingredientRecipe) {
+        ingredientRecipe.setPost(this);
+        this.recipeIngredients.add(ingredientRecipe);
+    }
 }

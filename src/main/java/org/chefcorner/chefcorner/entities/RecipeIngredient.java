@@ -2,13 +2,15 @@ package org.chefcorner.chefcorner.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "recipe_ingredients")
-public class IngredientRecipe {
+public class RecipeIngredient {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -20,8 +22,7 @@ public class IngredientRecipe {
     private Ingredient ingredient;
 
     @ManyToOne
-    @JoinColumn(name = "post_id", referencedColumnName = "id")
-    @EqualsAndHashCode.Exclude // Exclude this field from the equals and hashCode methods because it throws an infinite loop
+    @JoinColumn(name = "recipe_id", referencedColumnName = "id")
     @JsonIgnore
-    private Post post;
+    private Recipe recipe;
 }

@@ -18,5 +18,5 @@ public class Ingredient {
 
     @OneToMany(mappedBy = "ingredient")
     @JsonIgnore
-    private Set<IngredientRecipe> recipes = new HashSet<>();
+    private Set<RecipeIngredient> recipes = new HashSet<>();
 }

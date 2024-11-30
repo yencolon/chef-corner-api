@@ -1,10 +1,12 @@
 package org.chefcorner.chefcorner.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "white_list_tokens")
 public class WhiteListToken {
@@ -15,5 +17,6 @@ public class WhiteListToken {
     private String refreshToken;
     @OneToOne(mappedBy = "whiteListToken")
     @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
     private User user;
 }

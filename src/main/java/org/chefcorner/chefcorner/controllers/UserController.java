@@ -3,7 +3,7 @@ package org.chefcorner.chefcorner.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.chefcorner.chefcorner.entities.Post;
+import org.chefcorner.chefcorner.entities.Recipe;
 import org.chefcorner.chefcorner.entities.User;
 import org.chefcorner.chefcorner.services.implementation.UserService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,10 +27,9 @@ public class UserController {
         return this.userService.getUserById(id);
     }
 
-    @Operation(summary = "Get user posts")
-    @GetMapping("/{id}/posts")
-    public List<Post> getUserPosts(@PathVariable("id") Long id) {
-        return this.userService.getUserPosts(id);
+    @Operation(summary = "Get user recipes")
+    @GetMapping("/{id}/recipes") // Changed from "/posts" to "/recipes"
+    public List<Recipe> getUserRecipes(@PathVariable("id") Long id) { // Renamed from getUserPosts
+        return this.userService.getUserRecipes(id); // Assume corresponding method update in UserService
     }
-
 }

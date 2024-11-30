@@ -5,7 +5,9 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 // TODO: add tags, categories
@@ -44,11 +46,19 @@ public class Recipe {
     @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
 
-    @OneToMany(mappedBy = "recipe", cascade = { CascadeType.MERGE, CascadeType.PERSIST },  orphanRemoval = true)
-    private Set<IngredientRecipe> recipeIngredients = new HashSet<>();
+    @OneToMany(mappedBy = "recipe", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    private Set<RecipeIngredient> recipeIngredients = new HashSet<>();
 
-    public void addRecipeIngredient(IngredientRecipe ingredientRecipe) {
-        ingredientRecipe.setRecipe(this);
-        this.recipeIngredients.add(ingredientRecipe);
+    @OneToMany(mappedBy = "recipe", cascade = { CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE }, orphanRemoval = true)
+    private List<RecipeStep> recipeSteps = new ArrayList<>();
+
+    public void addRecipeIngredient(RecipeIngredient recipeIngredient) {
+        recipeIngredient.setRecipe(this);
+        this.recipeIngredients.add(recipeIngredient);
+    }
+
+    public void addRecipeStep(RecipeStep recipeStep) {
+        recipeStep.setRecipe(this);
+        this.recipeSteps.add(recipeStep);
     }
 }

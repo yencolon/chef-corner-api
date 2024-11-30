@@ -12,6 +12,7 @@ public class CreateRecipeRequest {
     private String title;
     private String description;
     private List<IngredientModelRequest> ingredients;
+    private List<RecipeStepModelRequest> recipeSteps;
     @NotNull(message = "Category is required")
     private Long categoryId;
     private boolean published;

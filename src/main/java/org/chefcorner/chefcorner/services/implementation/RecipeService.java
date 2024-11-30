@@ -37,80 +37,76 @@ public class RecipeService implements RecipeServiceInterface {
     @Override
     @Transactional
     public Recipe saveRecipe(CreateRecipeRequest recipeRequest, Authentication authentication) { // Renamed from savePost
-
-        Recipe newRecipe = new Recipe();
-        newRecipe.setTitle(recipeRequest.getTitle());
-        newRecipe.setDescription(recipeRequest.getDescription());
-        newRecipe.setPublished(recipeRequest.isPublished());
-        newRecipe.setDraft(recipeRequest.isDraft());
-
-        if (recipeRequest.isDraft()) newRecipe.setDraftedAt(System.currentTimeMillis());
-
-        if (recipeRequest.isPublished()) newRecipe.setPublishedAt(System.currentTimeMillis());
-
-        Category category = categoryRepository.findById(recipeRequest.getCategoryId()).orElse(null);
-        newRecipe.setCategory(category);
-
+        // Create new recipe
         User user = ((WebUserDetails)authentication.getPrincipal()).getUser();
+        Recipe newRecipe = new Recipe();
         newRecipe.setUser(user);
-
-        recipeRequest.getIngredients().forEach(ingredient -> {
-            Ingredient existingIngredient = this.ingredientService.findIngredientByName(ingredient.getName());
-
-            if (existingIngredient == null) {
-                existingIngredient = new Ingredient();
-                existingIngredient.setName(ingredient.getName());
-                this.ingredientService.saveIngredient(existingIngredient);
-            }
-
-            IngredientRecipe ingredientRecipe = new IngredientRecipe();
-            ingredientRecipe.setIngredient(existingIngredient);
-            ingredientRecipe.setQuantity(ingredient.getQuantity());
-            ingredientRecipe.setUnit(ingredient.getUnit());
-            newRecipe.addRecipeIngredient(ingredientRecipe);
-        });
+        populatedRecipe(newRecipe, recipeRequest);
         return this.recipeRepository.save(newRecipe);
     }
 
     @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)") // Updated security expression
     public Recipe updateRecipe(Long id, CreateRecipeRequest recipeRequest) { // Renamed from updatePost
-
+        // Update recipe
         Recipe recipeToUpdate = this.recipeRepository.findById(id).orElseThrow();
-        recipeToUpdate.setTitle(recipeRequest.getTitle());
-        recipeToUpdate.setDescription(recipeRequest.getDescription());
-        recipeToUpdate.setPublished(recipeRequest.isPublished());
-        recipeToUpdate.setDraft(recipeRequest.isDraft());
-
-        if (recipeRequest.isDraft()) recipeToUpdate.setDraftedAt(System.currentTimeMillis());
-
-        if (recipeRequest.isPublished()) recipeToUpdate.setPublishedAt(System.currentTimeMillis());
-
-        Category category = categoryRepository.findById(recipeRequest.getCategoryId()).orElse(null);
-        recipeToUpdate.setCategory(category);
-
-        recipeToUpdate.getRecipeIngredients().clear();
-
-        recipeRequest.getIngredients().forEach(ingredient -> {
-            Ingredient existingIngredient = this.ingredientService.findIngredientByName(ingredient.getName());
-
-            if (existingIngredient == null) {
-                existingIngredient = new Ingredient();
-                existingIngredient.setName(ingredient.getName());
-                this.ingredientService.saveIngredient(existingIngredient);
-            }
-
-            IngredientRecipe ingredientRecipe = new IngredientRecipe();
-            ingredientRecipe.setIngredient(existingIngredient);
-            ingredientRecipe.setQuantity(ingredient.getQuantity());
-            ingredientRecipe.setUnit(ingredient.getUnit());
-            recipeToUpdate.addRecipeIngredient(ingredientRecipe);
-        });
-
+        populatedRecipe(recipeToUpdate, recipeRequest);
         return this.recipeRepository.save(recipeToUpdate);
     }
 
     @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)") // Updated security expression
     public void deleteRecipe(Long id) { // Renamed from deletePost
         this.recipeRepository.deleteById(id);
+    }
+
+    private void populatedRecipe(Recipe recipe, CreateRecipeRequest recipeRequest) {
+
+        recipe.setTitle(recipeRequest.getTitle());
+        recipe.setDescription(recipeRequest.getDescription());
+        recipe.setPublished(recipeRequest.isPublished());
+        recipe.setDraft(recipeRequest.isDraft());
+
+        if (recipeRequest.isDraft()) recipe.setDraftedAt(System.currentTimeMillis());
+
+        if (recipeRequest.isPublished()) recipe.setPublishedAt(System.currentTimeMillis());
+
+        Category category = categoryRepository.findById(recipeRequest.getCategoryId()).orElse(null);
+        recipe.setCategory(category);
+
+        populatedIngredients(recipe, recipeRequest);
+        populatedRecipeSteps(recipe, recipeRequest);
+    }
+
+    private void populatedIngredients(Recipe recipe, CreateRecipeRequest recipeRequest) {
+        if(!recipe.getRecipeIngredients().isEmpty())
+            recipe.getRecipeIngredients().clear();
+
+        recipeRequest.getIngredients().forEach(ingredient -> {
+            Ingredient existingIngredient = this.ingredientService.findIngredientByName(ingredient.getName());
+
+            if (existingIngredient == null) {
+                existingIngredient = new Ingredient();
+                existingIngredient.setName(ingredient.getName());
+                this.ingredientService.saveIngredient(existingIngredient);
+            }
+
+            RecipeIngredient recipeIngredient = new RecipeIngredient();
+            recipeIngredient.setIngredient(existingIngredient);
+            recipeIngredient.setQuantity(ingredient.getQuantity());
+            recipeIngredient.setUnit(ingredient.getUnit());
+            recipe.addRecipeIngredient(recipeIngredient);
+        });
+    }
+
+    private void populatedRecipeSteps(Recipe recipe, CreateRecipeRequest recipeRequest) {
+        if(!recipe.getRecipeSteps().isEmpty())
+            recipe.getRecipeSteps().clear();
+
+        recipeRequest.getRecipeSteps().forEach(recipeStep -> {
+            RecipeStep newRecipeStep = new RecipeStep();
+            newRecipeStep.setTitle(recipeStep.getTitle());
+            newRecipeStep.setContent(recipeStep.getContent());
+            newRecipeStep.setStepOrder(recipeStep.getOrder());
+            recipe.addRecipeStep(newRecipeStep);
+        });
     }
 }

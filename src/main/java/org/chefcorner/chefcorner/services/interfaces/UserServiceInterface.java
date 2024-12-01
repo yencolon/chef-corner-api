@@ -8,5 +8,5 @@ public interface UserServiceInterface {
     List<User> getUsers();
     User getUser();
     User getUserById(Long id);
-    List<Recipe> getUserRecipes(Long id); // Renamed from getUserPosts
+    List<Recipe> getUserRecipes(Long id); // Renamed from getUserPost
 }

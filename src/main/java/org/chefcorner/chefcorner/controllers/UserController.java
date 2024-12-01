@@ -28,8 +28,8 @@ public class UserController {
     }
 
     @Operation(summary = "Get user recipes")
-    @GetMapping("/{id}/recipes") // Changed from "/posts" to "/recipes"
-    public List<Recipe> getUserRecipes(@PathVariable("id") Long id) { // Renamed from getUserPosts
-        return this.userService.getUserRecipes(id); // Assume corresponding method update in UserService
+    @GetMapping("/{id}/recipes")
+    public List<Recipe> getUserRecipes(@PathVariable("id") Long id) {
+        return this.userService.getUserRecipes(id);
     }
 }

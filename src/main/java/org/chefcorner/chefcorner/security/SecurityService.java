@@ -15,10 +15,10 @@ import java.util.Objects;
 public class SecurityService {
     private final RecipeRepository recipeRepository;
 
-    public boolean isRecipeOwner(Long recipeId, Authentication authentication) { // Renamed from isPostOwner
+    public boolean isRecipeOwner(Long recipeId, Authentication authentication) {
         User user = ((WebUserDetails) authentication.getPrincipal()).getUser();
-        Recipe recipe = recipeRepository.findById(recipeId) // Updated variable name
-                .orElseThrow(() -> new NotFoundException("Recipe not found with ID " + recipeId)); // Updated exception message
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> new NotFoundException("Recipe not found with ID " + recipeId));
         return Objects.equals(recipe.getUser().getId(), user.getId());
     }
 }

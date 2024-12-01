@@ -2,17 +2,19 @@ package org.chefcorner.chefcorner.services.implementation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.chefcorner.chefcorner.dto.request.CreateRecipeRequest; // Consider renaming this DTO if specific to recipes
+import org.chefcorner.chefcorner.dto.request.CreateRecipeRequest;
 import org.chefcorner.chefcorner.entities.*;
 import org.chefcorner.chefcorner.repositories.CategoryRepository;
-import org.chefcorner.chefcorner.repositories.RecipeRepository; // Update repository names if necessary
+import org.chefcorner.chefcorner.repositories.RecipeRepository;
 import org.chefcorner.chefcorner.security.WebUserDetails;
 import org.chefcorner.chefcorner.services.interfaces.RecipeServiceInterface;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -20,9 +22,10 @@ import java.util.List;
 @Slf4j
 public class RecipeService implements RecipeServiceInterface {
 
-    private final RecipeRepository recipeRepository; // Renamed from RecipeRepository
+    private final RecipeRepository recipeRepository;
     private final CategoryRepository categoryRepository;
     private final IngredientService ingredientService;
+    private final FileStorageService fileStorageService;
 
     @Override
     public List<Recipe> getRecipes() { // Renamed from getPosts
@@ -36,25 +39,27 @@ public class RecipeService implements RecipeServiceInterface {
 
     @Override
     @Transactional
-    public Recipe saveRecipe(CreateRecipeRequest recipeRequest, Authentication authentication) { // Renamed from savePost
+    public Recipe saveRecipe(CreateRecipeRequest recipeRequest, MultipartFile image, Authentication authentication) {
         // Create new recipe
         User user = ((WebUserDetails)authentication.getPrincipal()).getUser();
         Recipe newRecipe = new Recipe();
         newRecipe.setUser(user);
         populatedRecipe(newRecipe, recipeRequest);
+        uploadImage(newRecipe, image);
         return this.recipeRepository.save(newRecipe);
     }
 
-    @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)") // Updated security expression
-    public Recipe updateRecipe(Long id, CreateRecipeRequest recipeRequest) { // Renamed from updatePost
+    @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)")
+    public Recipe updateRecipe(Long id, CreateRecipeRequest recipeRequest, MultipartFile image) {
         // Update recipe
         Recipe recipeToUpdate = this.recipeRepository.findById(id).orElseThrow();
         populatedRecipe(recipeToUpdate, recipeRequest);
+        uploadImage(recipeToUpdate, image);
         return this.recipeRepository.save(recipeToUpdate);
     }
 
-    @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)") // Updated security expression
-    public void deleteRecipe(Long id) { // Renamed from deletePost
+    @PreAuthorize("@securityService.isRecipeOwner(#id, authentication)")
+    public void deleteRecipe(Long id) {
         this.recipeRepository.deleteById(id);
     }
 
@@ -108,5 +113,17 @@ public class RecipeService implements RecipeServiceInterface {
             newRecipeStep.setStepOrder(recipeStep.getOrder());
             recipe.addRecipeStep(newRecipeStep);
         });
+    }
+
+    private void uploadImage(Recipe recipe, MultipartFile image) {
+        if (image == null) {
+            return;
+        }
+        try {
+            String imagePath = fileStorageService.storeFile(image);
+            recipe.setImage(imagePath);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

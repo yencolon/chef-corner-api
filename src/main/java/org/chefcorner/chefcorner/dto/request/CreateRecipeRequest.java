@@ -2,11 +2,11 @@ package org.chefcorner.chefcorner.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Data;
+import lombok.Getter;
 
 import java.util.List;
 
-@Data
+@Getter
 public class CreateRecipeRequest {
     @NotBlank(message = "Title is required")
     private String title;

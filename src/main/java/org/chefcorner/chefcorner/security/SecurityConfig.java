@@ -38,6 +38,7 @@ public class SecurityConfig {
         return httpSecurity
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/").permitAll() // Allow Swagger UI paths
+                        .requestMatchers("resources/**").permitAll() // Allow images tests upload
                         .requestMatchers("/docs", "/v3/api-docs/**", "/swagger-ui/**").permitAll() // Allow Swagger UI paths
                         .requestMatchers("/api/auth/logout", "/api/auth/refresh").authenticated()
                         .requestMatchers("/api/auth/**").permitAll()

@@ -14,7 +14,7 @@ import java.io.IOException;
 // NOT USED IN PRODUCTION
 
 @Controller
-@RequestMapping("/uploads")
+@RequestMapping("/resources")
 public class ResourceController {
 
     //root path for image files
